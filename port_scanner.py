@@ -1,17 +1,23 @@
 import socket
+import threading
 
-target = input("Enter target host (e.g. google.com or 192.168.1.1): ")
-start_port = int(input("Enter starting port: "))
-end_port = int(input("Enter ending port: "))
+target = input("Enter target host: ")
+start_port = int(input("Enter start port: "))
+end_port = int(input("Enter end port: "))
 
-print(f"\nScanning {target} from port {start_port} to {end_port}...\n")
+print_lock = threading.Lock()
 
-for port in range(start_port, end_port + 1):
+def scan(port):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.settimeout(1)
-
     result = s.connect_ex((target, port))
-    if result == 0:
-        print(f"[OPEN] Port {port}")
-
+    with print_lock:
+        if result == 0:
+            print(f"[OPEN] Port {port}")
     s.close()
+
+print(f"\nStarting multithreaded scan on {target} from port {start_port} to {end_port}...\n")
+
+for port in range(start_port, end_port + 1):
+    t = threading.Thread(target=scan, args=(port,))
+    t.start()
