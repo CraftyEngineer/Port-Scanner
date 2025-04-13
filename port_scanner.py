@@ -1,5 +1,8 @@
 import socket
 import threading
+from colorama import Fore, Style, init
+
+init(autoreset=True)
 
 target = input("Enter target host: ")
 start_port = int(input("Enter start port: "))
@@ -13,8 +16,16 @@ def scan(port):
     result = s.connect_ex((target, port))
     with print_lock:
         if result == 0:
-            print(f"[OPEN] Port {port}")
+            print(f"{Fore.GREEN}[OPEN] Port {port}{Style.RESET_ALL}")
+            save_result(f"Port {port} is OPEN")
+        else:
+            print(f"{Fore.RED}[CLOSED] Port {port}{Style.RESET_ALL}")
+            save_result(f"Port {port} is CLOSED")
     s.close()
+
+def save_result(message):
+    with open("scan_results.txt", "a") as file:
+        file.write(message + "\n")
 
 print(f"\nStarting multithreaded scan on {target} from port {start_port} to {end_port}...\n")
 
