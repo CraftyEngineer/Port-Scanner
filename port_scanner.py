@@ -1,16 +1,17 @@
 import socket
 
-target = "google.com"
-port = 80
+target = input("Enter target host (e.g. google.com or 192.168.1.1): ")
+start_port = int(input("Enter starting port: "))
+end_port = int(input("Enter ending port: "))
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.settimeout(2)  # optional timeout in seconds
+print(f"\nScanning {target} from port {start_port} to {end_port}...\n")
 
-result = s.connect_ex((target, port))
+for port in range(start_port, end_port + 1):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(1)
 
-if result == 0:
-    print(f"Port {port} is open")
-else:
-    print(f"Port {port} is closed")
+    result = s.connect_ex((target, port))
+    if result == 0:
+        print(f"[OPEN] Port {port}")
 
-s.close()
+    s.close()
